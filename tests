@@ -1,0 +1,20 @@
+import sys
+sys.path.append('/home/fworme/anaconda3/envs/test/lib/python3.7/site-packages/')
+from owslib.wms import WebMapService
+
+wms = WebMapService('http://webservice1.sirs-fr.com/ows/?MAP=vhr_2018_center.qgs&VERSION=1.3.0')
+list(wms.contents)
+#Selection d'une couche parmi cette liste
+layer='DE_LR32_432'
+#Recupération de l'emprise de la couche
+bb1=wms[layer].boundingBox[0:-1]
+bb2=((bb1[2]+bb1[0])/2-10000,(bb1[3]+bb1[1])/2-10000,(bb1[2]+bb1[0])/2+10000,(bb1[3]+bb1[1])/2+10000)
+#Recupération de l'epsg
+epsg=wms[layer].boundingBox[-1]
+#Récupération de 'l'image : point technique -> déterminer le size
+img = wms.getmap(layers=[layer],srs=epsg ,bbox=bb2,size=(5000, 10000),format='image/jpeg',transparent=True)
+#Enregistement de l'image
+out=open('/home/fworme/Documents/test2_aspi_wms.jpg','w+b')
+out.write(img.read())
+out.close()
+
